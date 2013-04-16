@@ -127,11 +127,35 @@ describe("nedis", function() {
     });
   });
   
-  it("Should be able so set socket properties");
-  it("Should connect to the default host and port if not specified");
-  it("Should connect to the default host and a specified port");
-  it("Should notify when closing the connection");
+  it("Should connect to the default host and port if not specified", function(done) {
+    var client = nedis.createClient();
+    client.once("connect", function() {
+      "127.0.0.1".should.equal(this.socket.remoteAddress);
+      this.socket.remotePort.should.equal(6379);
+      done();
+    });
+  });
+  
+  it("Should connect to the default host and a specified port", function(done) {
+    var client = nedis.createClient(9999);
+    client.once("connect", function() {
+      "127.0.0.1".should.equal(this.socket.remoteAddress);
+      this.socket.remotePort.should.equal(9999);
+      done();
+    });
+  });
+
+  it("Should return an error when running an unexistent command", function(done) {
+    var client = nedis.createClient(); 
+    client.once("connect", function() {
+      client.do("make", "me", "a", "sandwich", function(err, data) {
+        should.exist(err);
+        done();
+      });
+    });
+  });
+
   it("Should connect using a unix socket");
-  it("Should return an error when running an unexistent command");
   //TODO: Probar datos numericos
+  //TODO: Probar timeout de conexion al redis
 });
