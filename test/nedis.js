@@ -14,8 +14,12 @@ describe("nedis", function() {
       });
     });
   });
-  
-  it("Should emit an error if it can't connect");
+  it("Should emit an error if it can't connect", function(done) {
+    var client = nedis.createClient(6900);
+    client.on("error", function(err) {
+      done();
+    });
+  });
   it("Should emit an error when it tries to run a command and there is a connection error");
   it("Should reconnect after a specified time");
   it("Should reconnect using a timeout function");
@@ -29,4 +33,5 @@ describe("nedis", function() {
   it("Should connect using a unix socket");
   it("Should support running commands without passing a callback function");
   it("Should return an error when running an unexistent command");
+  //TODO: Probar datos numericos
 });
