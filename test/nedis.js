@@ -65,15 +65,23 @@ describe("nedis", function() {
       });
     });
   });
-  it("Should notify when it is connected");
-  it("Should notify when it gets disconnected");
+  it("Should notify when it gets disconnected", function(done) {
+    var client = nedis.createClient();
+    client.once("connect", function() {
+      client.do("quit", function(err, data) {
+      });
+    });
+    client.once("close", function() {
+      done();
+    });
+  });
+  it("Should support running commands without passing a callback function");
   it("Should emit timeout when an operation exceeds a specific threshold");
   it("Should be able so set socket properties");
   it("Should connect to the default host and port if not specified");
   it("Should connect to the default host and a specified port");
   it("Should notify when closing the connection");
   it("Should connect using a unix socket");
-  it("Should support running commands without passing a callback function");
   it("Should return an error when running an unexistent command");
   //TODO: Probar datos numericos
 });
