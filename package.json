@@ -3,7 +3,8 @@
   "version": "0.0.1",
   "engine": "0.10.x",
   "dependencies": {
-    "hiredis": "0.1.x"
+    "hiredis": "0.1.x",
+    "sla": "0.0.x"
   },
   "devDependencies": {
     "mocha": "1.9.x",

@@ -5,6 +5,17 @@ var should = require("should"),
 
 describe("nedis", function() {
 
+  var timeoutServer;
+
+  before(function() {
+    timeoutServer = net.createServer();
+    timeoutServer.listen(9999, "localhost");
+  });
+
+  after(function() {
+    timeoutServer.close();
+  });
+
   beforeEach(function(done) {
     var socket = net.createConnection(6379);
     socket.on("connect", function() {
@@ -32,6 +43,7 @@ describe("nedis", function() {
       done();
     });
   });
+
   it("Should return an error when it tries to run a command and it's not connected", function(done) {
     var client = nedis.createClient(6379); 
     var opError = false;
@@ -47,6 +59,7 @@ describe("nedis", function() {
       });
     });
   });
+  
   it("Should reconnect after a specified time", function(done) {
     var client = nedis.createClient(6379, "localhost", {reconnectInterval: 50}); 
     client.once("connect", function() {
@@ -62,6 +75,7 @@ describe("nedis", function() {
       });
     });
   });
+  
   it("Should reconnect using a timeout function", function(done) {
     var client = nedis.createClient(6379, "localhost", {reconnectInterval: function() { return 50; }}); 
     client.once("connect", function() {
@@ -77,6 +91,7 @@ describe("nedis", function() {
       });
     });
   });
+  
   it("Should notify when it gets disconnected", function(done) {
     var client = nedis.createClient();
     client.once("connect", function() {
@@ -87,6 +102,7 @@ describe("nedis", function() {
       done();
     });
   });
+  
   it("Should support running commands without passing a callback function", function(done) {
     var client = nedis.createClient();
     client.once("connect", function() {
@@ -97,7 +113,20 @@ describe("nedis", function() {
       });
     });
   });
-  it("Should emit timeout when an operation exceeds a specific threshold");
+  
+  it("Should emit timeout when an operation exceeds a specific threshold", function(done) {
+    var client = nedis.createClient(9999, "localhost", {commandTimeout: 50});
+    client.once("connect", function() {
+      var startTime = process.hrtime();
+      client.do("get", "foo", function(err, data) {
+        should.exist(err);
+        var diff = process.hrtime(startTime);
+        (diff[1] / 1000000).should.be.above(49);
+        done();
+      });
+    });
+  });
+  
   it("Should be able so set socket properties");
   it("Should connect to the default host and port if not specified");
   it("Should connect to the default host and a specified port");
