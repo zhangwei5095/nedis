@@ -20,7 +20,21 @@ describe("nedis", function() {
       done();
     });
   });
-  it("Should emit an error when it tries to run a command and there is a connection error");
+  it("Should return an error when it tries to run a command and it's not connected", function(done) {
+    var client = nedis.createClient(6379); 
+    var opError = false;
+    client.on("error", function(err) {
+      opError.should.be.ok;
+      done();
+    });
+    client.on("ready", function() {
+      client.socket.end();
+      client.do("set", "foo", "bar", function(err, data) {
+        should.exist(err);
+        opError = true;
+      });
+    });
+  });
   it("Should reconnect after a specified time");
   it("Should reconnect using a timeout function");
   it("Should notify when it is connected");
